@@ -1,0 +1,38 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Databases and persistent application data
+data/
+database/
+postgres-data/
+redis-data/
+
+# Greenbone/GVM runtime data
+gvmd_data/
+openvas_data/
+openvas_log_data/
+vt_data/
+scap_data/
+cert_data/
+data_objects/
+gpg_data/
+notus_data/
+gsa_data/
+
+# TLS/private keys
+*.key
+*.pem
+*.p12
+*.crt
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
