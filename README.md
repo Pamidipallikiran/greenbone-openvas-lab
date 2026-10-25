@@ -6,6 +6,9 @@ This project documents a Greenbone/OpenVAS vulnerability management lab deployed
 
 The lab is designed to demonstrate vulnerability assessment, scanning, report generation, vulnerability analysis, and remediation workflows from a security operations perspective.
 
+<img width="3200" height="2000" alt="OpenVAS_Scanning_Infographic" src="https://github.com/user-attachments/assets/85d7b1c7-92c1-4511-9a56-cd1e98bb01f9" />
+
+
 ## Architecture
 
 ```text
