@@ -1,43 +1,64 @@
 # Greenbone OpenVAS Vulnerability Management Lab
 
-## Overview
+![Greenbone](https://img.shields.io/badge/Greenbone-Community%20Edition%2024.10-green)
+![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?logo=ubuntu&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-This project documents a Greenbone/OpenVAS vulnerability management lab deployed using Docker and the Greenbone Community Edition stack.
+A hands-on vulnerability management lab built on the Greenbone Community Edition (OpenVAS),
+deployed with Docker Compose. It documents the full workflow from deployment to scanning,
+analysis, reporting and remediation, from a security operations (SOC) perspective.
 
-The lab is designed to demonstrate vulnerability assessment, scanning, report generation, vulnerability analysis, and remediation workflows from a security operations perspective.
+![OpenVAS scanning infographic](docs/images/openvas-scanning-infographic.png)
 
-<img width="3200" height="2000" alt="OpenVAS_Scanning_Infographic" src="https://github.com/user-attachments/assets/85d7b1c7-92c1-4511-9a56-cd1e98bb01f9" />
+## Table of Contents
 
+- [Highlights](#highlights)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Components](#components)
+- [Quick Start](#quick-start)
+- [Scanning Workflow](#scanning-workflow)
+- [Sample Results](#sample-results)
+- [Use Cases](#use-cases)
+- [Repository Structure](#repository-structure)
+- [Security and Responsible Use](#security-and-responsible-use)
+- [Roadmap](#roadmap)
+- [License](#license)
+- [Author](#author)
+
+## Highlights
+
+- Reproducible Docker Compose deployment of Greenbone Community Edition 24.10
+- Authenticated (SSH) and unauthenticated scanning against lab targets
+- Real scan report with severity breakdown (see [`reports/`](reports/))
+- Written deployment guide covering targets, credentials, tasks and result analysis
 
 ## Architecture
 
 ```text
                     ┌──────────────────────────┐
-                    │      Target Systems       │
-                    │  Linux / Windows / VMs    │
+                    │      Target Systems      │
+                    │  Linux / Windows / VMs   │
                     └────────────┬─────────────┘
                                  │
                                  ▼
                     ┌──────────────────────────┐
                     │    Greenbone / OpenVAS   │
-                    │      Vulnerability       │
-                    │         Scanner          │
+                    │   Vulnerability Scanner  │
                     └────────────┬─────────────┘
                                  │
                                  ▼
                     ┌──────────────────────────┐
-                    │     Vulnerability        │
-                    │      Assessment          │
+                    │  Vulnerability Assessment│
                     └────────────┬─────────────┘
                                  │
                    ┌─────────────┴─────────────┐
-                   │                           │
                    ▼                           ▼
           ┌─────────────────┐         ┌─────────────────┐
-          │ Scan Results    │         │ Vulnerability   │
-          │ & Reports       │         │ Analysis        │
+          │  Scan Results   │         │  Vulnerability  │
+          │   & Reports     │         │    Analysis     │
           └────────┬────────┘         └────────┬────────┘
-                   │                           │
                    └─────────────┬─────────────┘
                                  ▼
                     ┌──────────────────────────┐
@@ -48,17 +69,9 @@ The lab is designed to demonstrate vulnerability assessment, scanning, report ge
 
 ## Technology Stack
 
-* Greenbone Community Edition
-* OpenVAS Scanner
-* Greenbone Vulnerability Manager (`gvmd`)
-* Greenbone Security Assistant (`gsad`)
-* PostgreSQL
-* Redis
-* Nginx
-* Docker
-* Docker Compose
+Greenbone Community Edition · OpenVAS Scanner · gvmd · gsad · PostgreSQL · Redis · Nginx · Docker · Docker Compose
 
-## Main Components
+## Components
 
 | Component           | Purpose                                         |
 | ------------------- | ----------------------------------------------- |
@@ -67,90 +80,96 @@ The lab is designed to demonstrate vulnerability assessment, scanning, report ge
 | `gsad`              | Web/API interface                               |
 | PostgreSQL          | Stores vulnerability management data            |
 | Redis               | Scanner-related runtime communication           |
-| Nginx               | Frontend/reverse proxy                          |
-| Vulnerability Tests | Vulnerability test feed                         |
+| Nginx               | Frontend / reverse proxy                        |
+| Vulnerability Tests | Vulnerability test (VT) feed                    |
 | SCAP Data           | Security Content Automation Protocol data       |
 | CERT Data           | CERT and advisory information                   |
 | Notus Data          | Local vulnerability detection data              |
 
-## Deployment
+## Quick Start
 
-The deployment is based on the Greenbone Community Edition Docker Compose stack.
+**Prerequisites:** a Linux host (tested on Ubuntu 22.04) with Docker Engine and the Docker Compose plugin.
 
-The reproducible deployment configuration is available under:
-
-```text
-config/docker-compose.yml
+```bash
+git clone https://github.com/Pamidipallikiran/greenbone-openvas-lab.git
+cd greenbone-openvas-lab/config
+docker compose up -d
 ```
+
+Then open `https://<host-ip>` in a browser. The first start downloads the vulnerability feeds,
+which can take a long time. See [`config/README.md`](config/README.md) for setting the admin
+password, stopping the stack and hardening notes, and the
+[deployment guide](docs/deployment-guide.pdf) for the full walkthrough.
 
 ## Scanning Workflow
 
 ```text
-Target Discovery
-      ↓
-Target Configuration
-      ↓
-Scan Configuration
-      ↓
-Vulnerability Scan
-      ↓
-Result Collection
-      ↓
-Severity Analysis
-      ↓
-Report Generation
-      ↓
-Remediation
+Target Discovery → Target Configuration → Scan Configuration → Vulnerability Scan
+      → Result Collection → Severity Analysis → Report Generation → Remediation
 ```
 
-## Example Use Cases
+## Sample Results
 
-* Vulnerability assessment of Linux systems
-* Vulnerability assessment of Windows systems
-* Identification of critical and high-risk vulnerabilities
-* Security baseline validation
-* Remediation verification
-* SOC vulnerability-management workflows
+Authenticated scan of the `ubuntu-self` host
+([full report](reports/openvas-scan-report-ubuntu-self-2026-07.pdf)):
 
-## Security Considerations
+| Critical | High | Medium | Low |
+| :------: | :--: | :----: | :-: |
+|    1     |  10  |   6    |  3  |
 
-This repository intentionally excludes:
+Findings shown have a QoD of 70 or higher (20 results after filtering 442 raw results).
 
-* Database contents
-* Vulnerability feed databases
-* Runtime logs
-* Private keys
-* Credentials
-* API tokens
-* TLS secrets
-* Persistent Docker volumes
+## Use Cases
 
-Configuration should be reviewed and sanitized before deploying in another environment.
+- Vulnerability assessment of Linux and Windows systems
+- Identification of critical and high-risk vulnerabilities
+- Security baseline validation
+- Remediation verification
+- SOC vulnerability-management workflows
 
-## Project Structure
+## Repository Structure
 
 ```text
 greenbone-openvas-lab/
 ├── README.md
+├── LICENSE
 ├── .gitignore
 ├── config/
-│   └── docker-compose.yml
-└── docs/
-    └── screenshots/
+│   ├── README.md              # how to run, stop and harden the stack
+│   └── docker-compose.yml     # Greenbone Community Edition 24.10 stack
+├── docs/
+│   ├── README.md
+│   ├── deployment-guide.pdf   # deployment and scanning walkthrough
+│   ├── images/                # infographic and diagrams
+│   └── screenshots/           # GSA interface screenshots
+└── reports/
+    ├── README.md
+    └── openvas-scan-report-ubuntu-self-2026-07.pdf
 ```
 
-## Future Improvements
+## Security and Responsible Use
 
-* Add deployment documentation
-* Add target configuration examples
-* Add authenticated-scan documentation
-* Add sample vulnerability reports
-* Add vulnerability remediation workflow
-* Integrate scan findings with Wazuh/SOAR
-* Add automated deployment validation
+- Only scan systems you own or have **explicit written permission** to test.
+- This repository intentionally excludes database contents, feed data, logs, private keys,
+  credentials, API tokens, TLS secrets and persistent Docker volumes (see `.gitignore`).
+- IP addresses in the documents are private lab addresses (RFC 1918).
+- Review and sanitize the configuration before reusing it in another environment.
+
+## Roadmap
+
+- [x] Deployment documentation
+- [x] Sample vulnerability report
+- [ ] Target configuration examples
+- [ ] Authenticated-scan documentation (Windows and Linux)
+- [ ] Vulnerability remediation workflow
+- [ ] Wazuh / SOAR integration
+- [ ] Automated deployment validation
+
+## License
+
+Released under the [MIT License](LICENSE).
 
 ## Author
 
-Kiran Pamidipalli
-
+**Kiran Pamidipalli**
 Cybersecurity | SOC | Vulnerability Management | Network Security
